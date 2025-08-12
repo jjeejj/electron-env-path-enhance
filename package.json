@@ -1,0 +1,54 @@
+{
+    "name": "electron-env-path-enhance",
+    "version": "1.0.0",
+    "description": "A TypeScript library to fix PATH environment variable issues in Electron applications",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "build": "tsc",
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "test:coverage": "jest --coverage",
+        "clean": "rm -rf dist",
+        "prepublishOnly": "npm run clean && npm run build && npm test",
+        "dev": "tsc --watch"
+    },
+    "keywords": [
+        "electron",
+        "path",
+        "environment",
+        "typescript",
+        "nodejs",
+        "shell",
+        "env"
+    ],
+    "author": "Your Name",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yourusername/electron-env-path-enhance.git"
+    },
+    "bugs": {
+        "url": "https://github.com/yourusername/electron-env-path-enhance/issues"
+    },
+    "homepage": "https://github.com/yourusername/electron-env-path-enhance#readme",
+    "devDependencies": {
+        "@types/jest": "^29.5.0",
+        "@types/node": "^20.0.0",
+        "@typescript-eslint/eslint-plugin": "^6.0.0",
+        "@typescript-eslint/parser": "^6.0.0",
+        "eslint": "^8.0.0",
+        "jest": "^29.5.0",
+        "prettier": "^3.0.0",
+        "ts-jest": "^29.1.0",
+        "typescript": "^5.0.0"
+    },
+    "engines": {
+        "node": ">=14.0.0"
+    }
+}

@@ -1,0 +1,30 @@
+# 源代码
+src/
+tests/
+
+# 配置文件
+tsconfig.json
+jest.config.js
+.eslintrc.js
+.prettierrc
+
+# 开发依赖
+node_modules/
+coverage/
+
+# Git 相关
+.git/
+.gitignore
+
+# 其他
+*.log
+*.tmp
+.DS_Store
+.vscode/
+.idea/
+
+# 保留的文件
+!dist/
+!README.md
+!LICENSE
+!package.json
