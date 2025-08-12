@@ -1,269 +1,201 @@
 # electron-env-path-enhance
 
 [![npm version](https://badge.fury.io/js/electron-env-path-enhance.svg)](https://badge.fury.io/js/electron-env-path-enhance)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://travis-ci.org/wenjunjiang/electron-env-path-enhance.svg?branch=master)](https://travis-ci.org/wenjunjiang/electron-env-path-enhance)
+[![Coverage Status](https://coveralls.io/repos/github/wenjunjiang/electron-env-path-enhance/badge.svg?branch=master)](https://coveralls.io/github/wenjunjiang/electron-env-path-enhance?branch=master)
 
-解决 Electron 应用中 PATH 环境变量丢失问题的 TypeScript 库。
+## Introduction
 
-## 问题背景
+`electron-env-path-enhance` is a utility library for enhancing the PATH environment variable in Electron applications. It solves the problem where Electron apps may not correctly inherit the system PATH environment variable on different operating systems, especially for applications launched via Finder on macOS.
 
-在 Electron 应用中，特别是在 macOS 系统上，应用启动时可能会丢失完整的 PATH 环境变量，导致无法找到系统命令和工具。这个问题通常发生在：
+## Features
 
-- 从 Finder 或 Dock 启动的 Electron 应用
-- 通过 GUI 方式启动的应用无法继承完整的 shell 环境变量
-- 需要调用系统命令（如 git、node、python 等）的 Electron 应用
+- Automatically detects and enhances the PATH environment variable for Electron applications
+- Supports macOS, Windows, and Linux platforms
+- Provides flexible configuration options
+- Includes detailed logging functionality for debugging
+- Supports TypeScript with complete type definitions
 
-## 解决方案
-
-`electron-env-path-enhance` 通过以下方式解决这个问题：
-
-1. **系统命令获取**：通过执行系统命令获取完整的 PATH
-2. **Shell 配置解析**：读取用户的 shell 配置文件（.zshrc、.bashrc 等）
-3. **智能合并**：合并多个来源的 PATH 并去重
-4. **跨平台支持**：支持 Windows、macOS 和 Linux
-
-## 安装
+## Installation
 
 ```bash
-npm install electron-env-path-enhance
+npm install electron-env-path-enhance --save
 ```
 
-## 快速开始
+Or using yarn:
 
-### 基本使用
-
-```typescript
-import { applyEnhancedPath } from 'electron-env-path-enhance';
-
-// 在 Electron 主进程启动时调用
-applyEnhancedPath();
-
-// 现在可以正常使用系统命令了
-import { execSync } from 'child_process';
-const result = execSync('which node', { encoding: 'utf8' });
-console.log('Node.js 路径:', result);
+```bash
+yarn add electron-env-path-enhance
 ```
 
-### 高级使用
+## Usage
 
-```typescript
-import { PathEnhancer, getEnhancedPath } from 'electron-env-path-enhance';
+Import and initialize in your Electron app's main process:
 
-// 创建增强器实例
-const enhancer = new PathEnhancer({
-    debug: true,           // 启用调试日志
-    timeout: 5000,         // 命令执行超时时间
-    validatePaths: true    // 验证路径是否存在
-});
-
-// 获取增强的 PATH（不修改进程环境变量）
-const enhancedPath = enhancer.getEnhancedSystemPath();
-console.log('增强的 PATH:', enhancedPath);
-
-// 应用到当前进程
-const appliedPath = enhancer.applyEnhancedPath();
-console.log('已应用 PATH:', appliedPath);
-```
-
-### 便捷函数
-
-```typescript
-import { 
-    getEnhancedPath, 
-    getSystemPath, 
-    getShellConfigPath 
-} from 'electron-env-path-enhance';
-
-// 获取增强的 PATH
-const enhancedPath = getEnhancedPath({ debug: true });
-
-// 仅获取系统 PATH
-const systemPath = getSystemPath();
-
-// 仅获取 Shell 配置 PATH
-const shellPath = getShellConfigPath();
-```
-
-## API 文档
-
-### PathEnhancer 类
-
-#### 构造函数
-
-```typescript
-new PathEnhancer(options?: PathEnhancerOptions)
-```
-
-**选项参数：**
-
-- `debug?: boolean` - 是否启用调试日志（默认：false）
-- `logger?: Logger` - 自定义日志器
-- `timeout?: number` - 命令执行超时时间，毫秒（默认：5000）
-- `validatePaths?: boolean` - 是否验证路径存在性（默认：true）
-
-#### 方法
-
-##### `getSystemPath(): string | null`
-
-通过执行系统命令获取完整的 PATH 环境变量。
-
-```typescript
-const systemPath = enhancer.getSystemPath();
-if (systemPath) {
-    console.log('系统 PATH:', systemPath);
-}
-```
-
-##### `getPathFromShellConfig(): string | null`
-
-从用户的 shell 配置文件中解析 PATH 定义。
-
-```typescript
-const shellPath = enhancer.getPathFromShellConfig();
-if (shellPath) {
-    console.log('Shell 配置 PATH:', shellPath);
-}
-```
-
-##### `getEnhancedSystemPath(): string`
-
-获取增强的系统 PATH，合并系统 PATH 和 shell 配置 PATH。
-
-```typescript
-const enhancedPath = enhancer.getEnhancedSystemPath();
-console.log('增强 PATH:', enhancedPath);
-```
-
-##### `applyEnhancedPath(): string`
-
-将增强的 PATH 应用到当前进程的环境变量中。
-
-```typescript
-const appliedPath = enhancer.applyEnhancedPath();
-console.log('已应用到进程:', appliedPath);
-```
-
-### 便捷函数
-
-#### `getEnhancedPath(options?: PathEnhancerOptions): string`
-
-快速获取增强的 PATH。
-
-#### `applyEnhancedPath(options?: PathEnhancerOptions): string`
-
-快速应用增强的 PATH 到当前进程。
-
-#### `getSystemPath(options?: PathEnhancerOptions): string | null`
-
-快速获取系统 PATH。
-
-#### `getShellConfigPath(options?: PathEnhancerOptions): string | null`
-
-快速获取 Shell 配置 PATH。
-
-## 在 Electron 中使用
-
-### 主进程中使用
-
-```typescript
-// main.ts
-import { app } from 'electron';
-import { applyEnhancedPath } from 'electron-env-path-enhance';
+```javascript
+const { app } = require('electron');
+const { enhancePath } = require('electron-env-path-enhance');
 
 app.whenReady().then(() => {
-    // 在应用准备就绪时增强 PATH
-    applyEnhancedPath({
-        debug: process.env.NODE_ENV === 'development'
-    });
-    
-    // 现在可以安全地使用需要 PATH 的功能
-    createWindow();
+  // Enhance PATH with default configuration
+  enhancePath();
+  
+  // Or use custom configuration
+  enhancePath({
+    additionalPaths: ['/usr/local/bin', '/opt/homebrew/bin'],
+    logLevel: 'info',
+    // Other options...
+  });
 });
 ```
 
-### 渲染进程中使用
+Using TypeScript:
 
 ```typescript
-// 在渲染进程中，通过 IPC 与主进程通信
-import { ipcRenderer } from 'electron';
+import { app } from 'electron';
+import { enhancePath, EnhancePathOptions } from 'electron-env-path-enhance';
 
-// 请求主进程增强 PATH
-ipcRenderer.invoke('enhance-path').then((enhancedPath) => {
-    console.log('PATH 已增强:', enhancedPath);
+app.whenReady().then(() => {
+  const options: EnhancePathOptions = {
+    additionalPaths: ['/usr/local/bin', '/opt/homebrew/bin'],
+    logLevel: 'info',
+    // Other options...
+  };
+  
+  enhancePath(options);
 });
 ```
 
-```typescript
-// 主进程 IPC 处理
-import { ipcMain } from 'electron';
-import { getEnhancedPath } from 'electron-env-path-enhance';
+## Configuration Options
 
-ipcMain.handle('enhance-path', () => {
-    return getEnhancedPath({ debug: true });
+The `enhancePath` function accepts an optional configuration object with the following options:
+
+| Option | Type | Default | Description |
+|------|------|--------|------|
+| `additionalPaths` | `string[]` | `[]` | Additional paths to add to PATH |
+| `logLevel` | `'debug' \| 'info' \| 'warn' \| 'error' \| 'silent'` | `'info'` | Log level |
+| `customShellPaths` | `string[]` | Platform-specific | Custom shell executable paths |
+| `skipSystemPath` | `boolean` | `false` | Whether to skip getting system PATH |
+| `onlyIfMissing` | `boolean` | `true` | Only enhance if PATH is missing or incomplete |
+| `deduplicate` | `boolean` | `true` | Whether to remove duplicate entries in PATH |
+
+## Platform-Specific Behavior
+
+### macOS
+
+On macOS, the library attempts to get the complete PATH environment variable from:
+
+1. The current process's PATH
+2. PATH obtained by executing shell commands
+3. Common default paths
+
+### Windows
+
+On Windows, the library merges:
+
+1. The current process's PATH
+2. PATH from user and system environment variables
+3. Common default Windows paths
+
+### Linux
+
+On Linux, the library primarily relies on the current process's PATH and adds some common Linux binary paths.
+
+## Logging
+
+The library uses built-in logging functionality that can be controlled via the `logLevel` option:
+
+```javascript
+enhancePath({
+  logLevel: 'debug' // Show all logs, including detailed debug information
 });
 ```
 
-## 支持的平台
+## Advanced Usage
 
-- **macOS**: ✅ 完全支持，解析 .zshrc、.bashrc、.bash_profile、.profile
-- **Linux**: ✅ 完全支持，解析常见的 shell 配置文件
-- **Windows**: ✅ 基础支持，通过 cmd 获取 PATH
+### Get Enhanced PATH Without Applying
 
-## 支持的 Shell
+```javascript
+const { getEnhancedPath } = require('electron-env-path-enhance');
 
-- Bash
-- Zsh
-- Fish（部分支持）
-- CMD（Windows）
-- PowerShell（Windows，通过 CMD 兼容）
-
-## 调试
-
-启用调试模式可以查看详细的执行过程：
-
-```typescript
-import { PathEnhancer, ConsoleLogger } from 'electron-env-path-enhance';
-
-const logger = new ConsoleLogger(true);
-const enhancer = new PathEnhancer({
-    debug: true,
-    logger: logger
+const enhancedPath = getEnhancedPath({
+  additionalPaths: ['/custom/path']
 });
 
-enhancer.applyEnhancedPath();
+console.log(enhancedPath);
 ```
 
-## 常见问题
+### Check if a Specific Executable is in PATH
 
-### Q: 为什么我的 Electron 应用找不到系统命令？
+```javascript
+const { findExecutableInPath } = require('electron-env-path-enhance');
 
-A: 这是因为通过 GUI 启动的应用无法继承完整的 shell 环境。使用本库可以解决这个问题。
+const nodePath = findExecutableInPath('node');
+if (nodePath) {
+  console.log(`Node.js executable is located at: ${nodePath}`);
+} else {
+  console.log('Node.js executable not found');
+}
+```
 
-### Q: 支持自定义 shell 配置文件路径吗？
+## License
 
-A: 目前自动检测常见的配置文件。如需自定义，可以通过环境变量或修改配置文件来实现。
+MIT
 
-### Q: 会影响应用启动性能吗？
+## Contributing
 
-A: 影响很小。库会缓存结果，并且有超时保护机制。
+Issues and pull requests are welcome!
 
-### Q: 在 Windows 上效果如何？
+## Author
 
-A: Windows 上的 PATH 问题较少，但库仍然提供基础支持。
+Wenjun Jiang
 
-## 贡献
+## Related Projects
 
-欢迎提交 Issue 和 Pull Request！
+- [electron-fix-path](https://github.com/sindresorhus/electron-fix-path) - A similar library with simpler functionality
+- [fix-path](https://github.com/sindresorhus/fix-path) - The base library for fixing PATH on macOS
 
-## 许可证
+## Changelog
 
-MIT License - 详见 [LICENSE](LICENSE) 文件。
+See [CHANGELOG.md](CHANGELOG.md) for detailed update history.
 
-## 更新日志
+## FAQ
 
-### 1.0.0
+### Why can't my Electron app find certain command-line tools?
 
-- 初始版本发布
-- 支持跨平台 PATH 增强
-- 完整的 TypeScript 类型定义
-- 单元测试覆盖
+This is typically because applications launched via GUI (like through Finder or Dock) don't inherit the complete shell environment variables. This library is designed to solve exactly this problem.
+
+### How do I debug PATH-related issues?
+
+Set `logLevel` to `'debug'` and check the console output to understand how PATH is being processed:
+
+```javascript
+enhancePath({
+  logLevel: 'debug'
+});
+```
+
+### Does it support Electron's renderer process?
+
+The library is primarily designed for the main process, as environment variables are typically handled there. If you need to use the enhanced PATH in a renderer process, you can get it from the main process via IPC.
+
+### How do I handle application-specific paths?
+
+Use the `additionalPaths` option to add application-specific paths:
+
+```javascript
+enhancePath({
+  additionalPaths: [
+    path.join(app.getAppPath(), 'bin'),
+    // Other app-specific paths...
+  ]
+});
+```
+
+## Support
+
+If you find any issues or have suggestions for improvements, please submit an issue on GitHub.
+
+---
+
+We hope this library helps you solve PATH environment variable issues in your Electron applications!
