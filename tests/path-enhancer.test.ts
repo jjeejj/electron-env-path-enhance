@@ -205,7 +205,7 @@ export PATH="$UNKNOWN_VAR:$PATH"
             expect(result).toContain('/usr/local/bin');
             expect(result).not.toContain('$UNKNOWN_VAR');
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                'Variable UNKNOWN_VAR not found discarding path segment: $UNKNOWN_VAR'
+                'Variable UNKNOWN_VAR not found, discarding path segment: $UNKNOWN_VAR'
             );
         });
     });
@@ -258,7 +258,7 @@ export PATH="$UNKNOWN_VAR:$PATH"
             expect(result).toContain('/bin');
             expect(result).not.toContain('$UNRESOLVED_VAR');
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                'Variable UNRESOLVED_VAR not found discarding path segment: $UNRESOLVED_VAR'
+                'Discarding path with unresolved variables: $UNRESOLVED_VAR'
             );
         });
     });
